@@ -1,6 +1,6 @@
 
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { nanoid } from 'nanoid';
 
 import Section from './components/Section';
@@ -14,27 +14,31 @@ const initialContacts = [
   { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
   { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
   { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+
 ];
 
 const App = () => {
   const [contacts, setContacts] = useState(initialContacts);
   const [filter, setFilter] = useState("")
+  const isFirstRender = useRef(true);
 
 
   const filterInputId = nanoid();
 
   useEffect(() => {
-    const contacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(contacts);
-    if (parsedContacts) {
-      setContacts(parsedContacts);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      const contacts = localStorage.getItem('contacts');
+      const parsedContacts = JSON.parse(contacts);
+      if (parsedContacts) {
+        setContacts(parsedContacts);
+      }
+      return;
     }
-  }, []
-  )
-
-  useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  }
+    , [contacts]);
+
 
   const changeContact = (name, number) => {
     if (contacts.find((contact) => {
@@ -101,7 +105,6 @@ const App = () => {
       </Section>
     </>
   );
-
 }
 
 export default App;
